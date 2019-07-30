@@ -4,7 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import lodash from "lodash";
 import moment from "moment";
-import "./semantic.min.css";
+import "semantic-ui-css/semantic.min.css";
 import { Image, Card, Label, Header } from "semantic-ui-react";
 // import { css } from "glamor";
 
