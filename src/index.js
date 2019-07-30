@@ -6,7 +6,6 @@ import lodash from "lodash";
 import moment from "moment";
 import "semantic-ui-css/semantic.min.css";
 import { Image, Card, Label, Header } from "semantic-ui-react";
-// import { css } from "glamor";
 
 let COLOR = {
   green: "#8BC34A",
