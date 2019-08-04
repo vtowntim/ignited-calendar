@@ -55,6 +55,7 @@ function useTrelloBoard(boardId) {
   const [board, setBoard] = React.useState(null);
   const [lists, setLists] = React.useState([]);
   const [cards, setCards] = React.useState([]);
+  const [labels, setLabels] = React.useState([]);
 
   React.useEffect(() => {
     var request = new XMLHttpRequest();
@@ -104,7 +105,15 @@ function useTrelloBoard(boardId) {
         });
 
         setCards(returnedCards);
-        console.log(returnedCards);
+
+        let _labels = [];
+        returnedCards.forEach(c => {
+          if (c.labels.length > 0) _labels.push(...c.labels);
+        });
+
+        _labels = lodash.uniqBy(_labels, "name");
+
+        setLabels(_labels);
       } else {
         // We reached our target server, but it returned an error
       }
@@ -140,16 +149,51 @@ function useTrelloBoard(boardId) {
   }, []);
 
   // console.log(boardId, board, lists, cards);
-  return [board, lists, cards];
+  return [board, lists, cards, labels];
 }
 
 function App() {
-  const [board, lists, cards] = useTrelloBoard(BOARD);
+  const [board, lists, cards, labels] = useTrelloBoard(BOARD);
+
+  const [filter, setFilter] = React.useState([]);
+
+  let filteredCards = cards.filter(c => {
+    if (!filter.length) return c;
+
+    if (lodash.intersection(c.labels.map(l => l.name), filter).length) {
+      return c;
+    }
+  });
 
   return (
     <div className="App">
+      <br />
+      <Label.Group align="center">
+        {/* <Label size="large" basic={ filter !== 'View All' } >View All</Label> */}
+
+        {labels.map(l => {
+          return (
+            <Label
+              size="large"
+              basic={!filter.includes(l.name)}
+              color={l.color}
+              key={l.id}
+              onClick={() => {
+                if (filter.includes(l.name)) {
+                  setFilter(lodash.without(filter, l.name));
+                } else {
+                  setFilter([...filter, l.name]);
+                }
+              }}
+            >
+              {l.name}
+            </Label>
+          );
+        })}
+      </Label.Group>
+
       {lists.map(l => {
-        return <List key={l.id} list={l} cards={cards} />;
+        return <List key={l.id} list={l} cards={filteredCards} />;
       })}
     </div>
   );
